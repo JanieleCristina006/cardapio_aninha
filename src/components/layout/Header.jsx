@@ -1,4 +1,5 @@
-import { Menu, MessageSquare } from "lucide-react"
+import { Menu } from "lucide-react"
+import aninhaAnimacao from "../../assets/aninha_animação.mp4";
 
 export function Header() {
   return (
@@ -14,8 +15,15 @@ export function Header() {
         </h1>
       </div>
 
-      <button className="w-14 h-14 flex items-center justify-center rounded-full bg-green-500 text-white shadow-lg hover:scale-105 transition">
-        <MessageSquare size={22} />
+      <button className="w-14 h-14 rounded-full bg-green-500 overflow-hidden shadow-lg hover:scale-105 transition">
+        <video
+          src={aninhaAnimacao}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        />
       </button>
 
     </header>

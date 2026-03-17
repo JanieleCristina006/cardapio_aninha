@@ -1,38 +1,29 @@
+import { useEffect, useState } from "react"
 import { ProductCard } from "./ProductCard"
 
 export function FeaturedProducts() {
-  const products = [
-    {
-      id: 1,
-      title: "Donut Premium",
-      description:
-        "Massa artesanal com cobertura de morango e confeitos crocantes.",
-      price: "R$ 12,90",
-      image:
-        "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 2,
-      title: "Cheesecake no Pote",
-      description:
-        "Creme de queijo suave com calda de frutas vermelhas e base crocante.",
-      price: "R$ 18,50",
-      image:
-        "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 3,
-      title: "Brownie de Nozes",
-      description:
-        "Super úmido, com pedaços generosos de nozes e chocolate intenso.",
-      price: "R$ 15,00",
-      image:
-        "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80",
-    },
-  ]
+  const [products, setProducts] = useState([])
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const response = await fetch(
+          "https://ecommerce-api-4k6g.onrender.com/api/v1/products/"
+        )
+
+        const data = await response.json()
+
+        setProducts(data.results)
+      } catch (error) {
+        console.error("Erro ao buscar produtos", error)
+      }
+    }
+
+    loadProducts()
+  }, [])
 
   function handleAdd(product, qty) {
-    console.log("Produto:", product.title)
+    console.log("Produto:", product.name)
     console.log("Quantidade:", qty)
   }
 
@@ -46,10 +37,13 @@ export function FeaturedProducts() {
         {products.map((p) => (
           <ProductCard
             key={p.id}
-            image={p.image}
-            title={p.title}
+            image={p.image_url}
+            title={p.name}
             description={p.description}
-            price={p.price}
+            price={Number(p.price).toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            })}
             onAdd={({ qty }) => handleAdd(p, qty)}
           />
         ))}
