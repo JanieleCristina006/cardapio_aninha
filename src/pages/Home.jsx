@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useCart } from "../hooks/useCart"
 
 import { Header } from "../components/layout/Header"
 import { HeroSection } from "../components/hero/HeroSection"
@@ -13,9 +14,11 @@ export function Home() {
   const [activeCategory, setActiveCategory] = useState("doces")
   const [cartOpen, setCartOpen] = useState(false)
 
+  const { addToCart } = useCart()
+
   return (
-    <div className="min-h-screen bg-neutral-100 relative">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pb-28">
+    <div className="relative min-h-screen bg-neutral-100">
+      <div className="mx-auto w-full max-w-6xl px-4 pb-28 sm:px-6 lg:px-8">
         <Header />
         <HeroSection />
         <StoreStatus />
@@ -26,7 +29,7 @@ export function Home() {
           onChange={setActiveCategory}
         />
 
-        <FeaturedProducts />
+        <FeaturedProducts onAddToCart={addToCart} />
       </div>
 
       <div className="lg:hidden">

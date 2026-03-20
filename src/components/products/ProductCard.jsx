@@ -1,7 +1,16 @@
 import { useMemo, useState } from "react"
 import { Minus, Plus, ShoppingCart } from "lucide-react"
+import toast from "react-hot-toast"
+
+function formatPrice(value) {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  })
+}
 
 export function ProductCard({
+  id,
   image,
   title,
   description,
@@ -23,31 +32,37 @@ export function ProductCard({
   }
 
   function handleAdd() {
-    onAdd?.({ title, qty })
+    onAdd?.({
+      id,
+      image,
+      title,
+      description,
+      price: Number(price),
+      qty,
+    })
+
+    toast.success(`${title} adicionado ao carrinho 🛒`)
   }
 
   return (
-    <article className="rounded-2xl bg-white border border-pink-100 shadow-sm overflow-hidden">
-      {/* Layout: coluna no mobile, linha no sm+ */}
+    <article className="overflow-hidden rounded-2xl border border-pink-100 bg-white shadow-sm">
       <div className="flex flex-col sm:flex-row">
-        {/* Image */}
-        <div className="w-full sm:w-32 shrink-0">
+        <div className="w-full shrink-0 sm:w-32">
           <img
             src={image}
             alt={title}
-            className="h-44 w-full sm:h-full sm:w-full object-cover"
+            className="h-44 w-full object-cover sm:h-full sm:w-full"
           />
         </div>
 
-        {/* Content */}
-        <div className="flex-1 p-4 min-w-0">
-          <h3 className="text-base font-semibold text-zinc-900 truncate">
+        <div className="min-w-0 flex-1 p-4">
+          <h3 className="truncate text-base font-semibold text-zinc-900">
             {title}
           </h3>
 
           <p
             className={[
-              "mt-1 text-sm text-zinc-500 leading-snug",
+              "mt-1 text-sm leading-snug text-zinc-500",
               expanded ? "" : "line-clamp-2",
             ].join(" ")}
           >
@@ -64,17 +79,17 @@ export function ProductCard({
             </button>
           )}
 
-          {/* Footer / actions */}
           <div className="mt-4 flex items-center justify-between gap-3">
-            <p className="text-lg font-extrabold text-pink-600">{price}</p>
+            <p className="text-lg font-extrabold text-pink-600">
+              {formatPrice(Number(price))}
+            </p>
 
             <div className="flex items-center gap-2">
-              {/* Stepper */}
-              <div className="flex items-center rounded-xl bg-pink-50 border border-pink-100">
+              <div className="flex items-center rounded-xl border border-pink-100 bg-pink-50">
                 <button
                   type="button"
                   onClick={dec}
-                  className="h-10 w-10 grid place-items-center text-pink-600 hover:bg-pink-100 rounded-xl transition"
+                  className="grid h-10 w-10 place-items-center rounded-xl text-pink-600 transition hover:bg-pink-100"
                   aria-label={`Diminuir quantidade de ${title}`}
                 >
                   <Minus size={16} />
@@ -87,19 +102,17 @@ export function ProductCard({
                 <button
                   type="button"
                   onClick={inc}
-                  className="h-10 w-10 grid place-items-center text-pink-600 hover:bg-pink-100 rounded-xl transition"
+                  className="grid h-10 w-10 place-items-center rounded-xl text-pink-600 transition hover:bg-pink-100"
                   aria-label={`Aumentar quantidade de ${title}`}
                 >
                   <Plus size={16} />
                 </button>
               </div>
 
-              {/* Add */}
               <button
                 type="button"
                 onClick={handleAdd}
-                className="h-10 px-3 rounded-xl bg-pink-600 text-white text-sm font-semibold
-                           inline-flex items-center gap-2 hover:opacity-90 transition"
+                className="inline-flex h-10 items-center gap-2 rounded-xl bg-pink-600 px-3 text-sm font-semibold text-white transition hover:opacity-90"
                 aria-label={`Adicionar ${qty} de ${title} ao carrinho`}
               >
                 <ShoppingCart size={16} />

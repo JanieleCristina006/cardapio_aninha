@@ -1,86 +1,60 @@
 import { Home, BookOpen, ShoppingCart, Tag, User } from "lucide-react"
+import { useCart } from "../../hooks/useCart"
 
 export function BottomNavigation({ active = "home", onCartClick }) {
+  const { totalItems } = useCart()
+
   const items = [
     { id: "home", label: "Início", icon: Home },
-    { id: "menu", label: "Cardápio", icon: BookOpen },
+    // { id: "menu", label: "Cardápio", icon: BookOpen },
+    { id: "cart", label: "Carrinho", icon: ShoppingCart },
     { id: "promo", label: "Promo", icon: Tag },
     { id: "profile", label: "Perfil", icon: User },
   ]
 
   return (
-    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-white rounded-3xl shadow-xl py-4 px-6 flex items-center justify-between z-50">
-      
-      {/* Left Items */}
-      <div className="flex items-center gap-8">
-        {items.slice(0, 2).map((item) => {
-          const Icon = item.icon
-          const isActive = active === item.id
+    <nav className="fixed bottom-6 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 items-center justify-between rounded-3xl bg-white px-6 py-4 shadow-xl">
 
-          return (
-            <button
-              key={item.id}
-              className="flex flex-col items-center text-sm"
+      {items.map((item) => {
+        const Icon = item.icon
+        const isActive = active === item.id
+
+        const isCart = item.id === "cart"
+
+        return (
+          <button
+            key={item.id}
+            onClick={isCart ? onCartClick : undefined}
+            className={`relative flex flex-col items-center gap-1 transition-all duration-300 ${
+              isActive ? "-translate-y-2" : ""
+            }`}
+          >
+            <Icon
+              size={22}
+              className={`transition ${
+                isActive ? "text-pink-600" : "text-zinc-400"
+              }`}
+            />
+
+            <span
+              className={`text-xs ${
+                isActive
+                  ? "text-pink-600 font-semibold"
+                  : "text-zinc-400"
+              }`}
             >
-              <Icon
-                size={24}
-                className={
-                  isActive ? "text-pink-600" : "text-zinc-400"
-                }
-              />
-              <span
-                className={
-                  isActive
-                    ? "text-pink-600 font-semibold"
-                    : "text-zinc-400"
-                }
-              >
-                {item.label}
+              {item.label}
+            </span>
+
+            {/* Badge */}
+            {isCart && totalItems > 0 && (
+              <span className="absolute -right-2 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-pink-600 text-[10px] font-bold text-white shadow">
+                {totalItems}
               </span>
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Center Cart Button */}
-      <button
-        type="button"
-        onClick={onCartClick}
-        className="absolute left-1/2 -translate-x-1/2 -top-6 h-16 w-16 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-lg border-4 border-white"
-      >
-        <ShoppingCart size={26} />
-      </button>
-
-      {/* Right Items */}
-      <div className="flex items-center gap-8">
-        {items.slice(2).map((item) => {
-          const Icon = item.icon
-          const isActive = active === item.id
-
-          return (
-            <button
-              key={item.id}
-              className="flex flex-col items-center text-sm"
-            >
-              <Icon
-                size={24}
-                className={
-                  isActive ? "text-pink-600" : "text-zinc-400"
-                }
-              />
-              <span
-                className={
-                  isActive
-                    ? "text-pink-600 font-semibold"
-                    : "text-zinc-400"
-                }
-              >
-                {item.label}
-              </span>
-            </button>
-          )
-        })}
-      </div>
+            )}
+          </button>
+        )
+      })}
 
     </nav>
   )

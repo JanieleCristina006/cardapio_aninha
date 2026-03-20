@@ -1,53 +1,86 @@
 import { useEffect, useState } from "react"
 import { ProductCard } from "./ProductCard"
 
-export function FeaturedProducts() {
+export function FeaturedProducts({ onAddToCart }) {
   const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   useEffect(() => {
     async function loadProducts() {
       try {
+        setLoading(true)
+        setError("")
+
         const response = await fetch(
           "https://ecommerce-api-4k6g.onrender.com/api/v1/products/"
         )
 
+        if (!response.ok) {
+          throw new Error("Erro ao buscar produtos")
+        }
+
         const data = await response.json()
 
-        setProducts(data.results)
-      } catch (error) {
-        console.error("Erro ao buscar produtos", error)
+        const formattedProducts = data.results.map((product) => ({
+          id: product.id,
+          image: product.image_url,
+          title: product.name,
+          description: product.description,
+          price: Number(product.price),
+          stock: product.stock,
+          category: product.category,
+        }))
+
+        setProducts(formattedProducts)
+      } catch (err) {
+        console.error(err)
+        setError("Não foi possível carregar os produtos.")
+      } finally {
+        setLoading(false)
       }
     }
 
     loadProducts()
   }, [])
 
-  function handleAdd(product, qty) {
-    console.log("Produto:", product.name)
-    console.log("Quantidade:", qty)
+  if (loading) {
+    return (
+      <div className="py-8 text-center text-sm text-zinc-500">
+        Carregando produtos...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="py-8 text-center text-sm text-red-500">
+        {error}
+      </div>
+    )
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="py-8 text-center text-sm text-zinc-500">
+        Nenhum produto encontrado.
+      </div>
+    )
   }
 
   return (
-    <section className="mt-10">
-      <h2 className="text-lg font-semibold text-zinc-900">
-        Doces em Destaque
-      </h2>
-
-      <div className="mt-6 space-y-4">
-        {products.map((p) => (
-          <ProductCard
-            key={p.id}
-            image={p.image_url}
-            title={p.name}
-            description={p.description}
-            price={Number(p.price).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-            onAdd={({ qty }) => handleAdd(p, qty)}
-          />
-        ))}
-      </div>
-    </section>
+    <div className="space-y-4">
+      {products.map((product) => (
+        <ProductCard
+          key={product.id}
+          id={product.id}
+          image={product.image}
+          title={product.title}
+          description={product.description}
+          price={product.price}
+          onAdd={onAddToCart}
+        />
+      ))}
+    </div>
   )
 }
