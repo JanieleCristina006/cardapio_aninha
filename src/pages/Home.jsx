@@ -19,7 +19,6 @@ export function Home() {
   return (
     <div className="relative min-h-screen bg-neutral-100">
       <div className="mx-auto w-full max-w-6xl px-4 pb-28 sm:px-6 lg:px-8">
-        <Header />
         <HeroSection />
         <StoreStatus />
         <PartnersSection />
@@ -32,7 +31,7 @@ export function Home() {
         <FeaturedProducts onAddToCart={addToCart} />
       </div>
 
-      <div className="lg:hidden">
+      <div className="">
         <BottomNavigation
           active="home"
           onCartClick={() => setCartOpen(true)}
