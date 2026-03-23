@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -36,27 +35,20 @@ export const Login = () => {
       );
 
       const data = await response.json();
+      console.log(data);
 
       if (!response.ok) {
-        throw new Error(data?.detail || "Usuário ou senha inválidos");
+        throw new Error("Usuário ou senha inválidos");
       }
 
       // 🔐 salva token
       localStorage.setItem("token", data.access);
 
-      // ✅ SUCESSO
-      toast.success("Login efetuado com sucesso! 🎉");
-
       // 🚀 redireciona
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
-
+      navigate("/");
     } catch (err) {
       console.error(err);
-
-      // ❌ ERRO
-      toast.error(err.message || "Erro ao fazer login");
+      alert("Erro ao fazer login");
     }
   }
 
@@ -70,6 +62,7 @@ export const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           
+          {/* Username */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-600">
               Usuário
@@ -83,6 +76,7 @@ export const Login = () => {
             />
           </div>
 
+          {/* Password */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-600">
               Senha
