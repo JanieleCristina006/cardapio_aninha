@@ -1,8 +1,16 @@
-import { useState, useEffect } from "react";
-import { X, Trash2 } from "lucide-react";
+import { Trash2, X } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import {
+  business,
+  defaultProfile,
+  PROFILE_STORAGE_KEY,
+} from "../../data/catalog";
+import { useCart } from "../../hooks/useCart";
+import { createOrder, getAccessToken } from "../../services/api";
 import { CartItem } from "./CartItem";
 import { CartSummary } from "./CartSummary";
-import { useCart } from "../../hooks/useCart";
 
 function formatPrice(value) {
   return Number(value).toLocaleString("pt-BR", {
@@ -11,132 +19,182 @@ function formatPrice(value) {
   });
 }
 
+const emptyCustomer = {
+  name: "",
+  phone: "",
+  address: "",
+  house_number: "",
+};
+
+function readStoredProfile() {
+  try {
+    const storedProfile = localStorage.getItem(PROFILE_STORAGE_KEY);
+    return storedProfile ? JSON.parse(storedProfile) : defaultProfile;
+  } catch {
+    return defaultProfile;
+  }
+}
+
 export function CartDrawer({ open, onClose }) {
-  const { items, clearCart, increaseQty, decreaseQty, removeFromCart } = useCart();
+  const navigate = useNavigate();
+  const { items, clearCart, increaseQty, decreaseQty, removeFromCart } =
+    useCart();
 
-  const [step, setStep] = useState("carrinho"); // carrinho ou checkout
-  const [cliente, setCliente] = useState({
-    name: "",
-    phone: "",
-    address: "",
-    house_number: "",
-  });
-
-  const [deliveryType, setDeliveryType] = useState("retirada"); // "retirada" ou "entrega"
-  const [paymentMethod, setPaymentMethod] = useState("dinheiro"); // "dinheiro" ou "cartao"
+  const [step, setStep] = useState("carrinho");
+  const [customer, setCustomer] = useState(emptyCustomer);
+  const [deliveryType, setDeliveryType] = useState("retirada");
+  const [paymentMethod, setPaymentMethod] = useState("pix");
   const [changeAmount, setChangeAmount] = useState("");
-  const [observacao, setObservacao] = useState("");
+  const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const subtotal = items.reduce((acc, item) => acc + Number(item.price) * Number(item.qty), 0);
-  const delivery = deliveryType === "entrega" ? 5 : 0;
+  const subtotal = items.reduce(
+    (acc, item) => acc + Number(item.price) * Number(item.qty),
+    0
+  );
+  const delivery = deliveryType === "entrega" ? business.deliveryFee : 0;
   const total = subtotal + delivery;
 
-  // Pega dados do usuário logado
-  useEffect(() => {
-    if (step === "checkout") {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+  function updateCustomer(field, value) {
+    setCustomer((currentCustomer) => ({
+      ...currentCustomer,
+      [field]: value,
+    }));
+  }
 
-      fetch("https://ecommerce-api-4k6g.onrender.com/api/v1/customers/", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          const user = data.results?.[0];
-          if (user) {
-            const confirmUse = window.confirm(
-              "Deseja usar os dados do cadastro para preencher o pedido?"
-            );
-            if (confirmUse) {
-              setCliente({
-                name: user.name,
-                phone: user.phone,
-                address: user.address,
-                house_number: user.house_number,
-              });
-            }
-          }
-        })
-        .catch(console.error);
-    }
-  }, [step]);
+  function handleClose() {
+    setStep("carrinho");
+    onClose?.();
+  }
 
-  const handleSendWhatsApp = () => {
-    if (paymentMethod === "dinheiro" && Number(changeAmount) < total) {
-      alert("O valor do troco não pode ser menor que o total do pedido!");
+  function handleStartCheckout() {
+    if (!getAccessToken()) {
+      toast.error("Faca login para finalizar o pedido.");
+      handleClose();
+      navigate("/login");
       return;
     }
 
-    let message = `Novo Pedido\n\n`;
-    message += `Cliente: ${cliente.name}\n`;
-    message += `Telefone: ${cliente.phone}\n`;
-    message += `Tipo de pedido: ${deliveryType === "retirada" ? "Retirada no local" : "Entrega"}\n`;
-    if (deliveryType === "entrega") {
-      message += `Endereço: ${cliente.address}, Nº ${cliente.house_number}\n`;
-    }
-    message += `\nItens:\n`;
-    items.forEach((item) => {
-      message += `- ${item.name} x${item.qty} = ${formatPrice(Number(item.price) * Number(item.qty))}\n`;
+    const profile = readStoredProfile();
+    setCustomer({
+      name: profile.name || "",
+      phone: profile.phone || "",
+      address: profile.address || "",
+      house_number: profile.house_number || "",
     });
-    message += `\nSubtotal: ${formatPrice(subtotal)}\n`;
-    message += `Taxa de entrega: ${formatPrice(delivery)}\n`;
-    message += `Total: ${formatPrice(total)}\n`;
-    message += `Pagamento: ${paymentMethod}\n`;
-    if (paymentMethod === "dinheiro") {
-      message += `Troco para: ${formatPrice(Number(changeAmount))}\n`;
-    }
-    if (observacao) {
-      message += `Observação: ${observacao}\n`;
+    setStep("checkout");
+  }
+
+  async function handleCreateOrder() {
+    if (!customer.name.trim() || !customer.phone.trim()) {
+      alert("Informe nome e telefone para finalizar o pedido.");
+      return;
     }
 
-    const url = `https://wa.me/5535997554926?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
-  };
+    if (
+      paymentMethod === "dinheiro" &&
+      changeAmount &&
+      Number(changeAmount) < total
+    ) {
+      alert("O valor para troco nao pode ser menor que o total do pedido.");
+      return;
+    }
+
+    const remaining =
+      paymentMethod === "dinheiro" && changeAmount
+        ? Math.max(Number(changeAmount) - total, 0)
+        : 0;
+
+    const payload = {
+      name_customer: customer.name,
+      phone: customer.phone,
+      address:
+        deliveryType === "entrega"
+          ? customer.address
+          : customer.address || "Retirada no local",
+      house_number: customer.house_number,
+      observation: notes,
+      subtotal: subtotal.toFixed(2),
+      rate_delivery: delivery.toFixed(2),
+      total: total.toFixed(2),
+      remaining: remaining.toFixed(2),
+      payment_method: paymentMethod,
+      itens: items.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: Number(item.price),
+        quantity: Number(item.qty),
+      })),
+    };
+
+    try {
+      setSubmitting(true);
+      await createOrder(payload);
+      toast.success("Pedido criado");
+      clearCart();
+      handleClose();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50">
-      {/* Fundo preto */}
-      <button className="absolute inset-0 bg-black/40" onClick={onClose} aria-label="Fechar carrinho" />
+    <div className="fixed inset-0 z-[80]">
+      <button
+        type="button"
+        className="bottom-sheet-overlay absolute inset-0 bg-black/45"
+        onClick={handleClose}
+        aria-label="Fechar carrinho"
+      />
 
-      {/* Modal */}
-      <div className="absolute left-1/2 top-1/2 w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-3xl bg-white shadow-2xl">
+      <div className="bottom-sheet-panel absolute inset-x-0 bottom-0 mx-auto flex max-h-[88dvh] w-full max-w-md flex-col overflow-hidden rounded-t-[28px] bg-white shadow-2xl">
         <div className="flex justify-center pt-3">
-          <div className="h-1.5 w-12 rounded-full bg-pink-200" />
+          <div className="h-1.5 w-12 rounded-full bg-neutral-300" />
         </div>
 
-        <div className="flex items-center justify-between px-6 py-4">
-          <button onClick={onClose} className="text-zinc-500 transition hover:text-zinc-800" aria-label="Fechar">
+        <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-neutral-500 transition hover:text-neutral-900"
+            aria-label="Fechar"
+          >
             <X size={22} />
           </button>
 
-          <h3 className="text-lg font-extrabold text-zinc-800">
-            {step === "carrinho" ? "Meu Carrinho" : "Finalizar Pedido"}
+          <h3 className="text-lg font-bold text-neutral-950">
+            {step === "carrinho" ? "Carrinho" : "Finalizar pedido"}
           </h3>
 
-          {step === "carrinho" && (
+          {step === "carrinho" ? (
             <button
-              className="text-pink-600 transition hover:opacity-80 disabled:opacity-40"
+              type="button"
+              className="text-neutral-500 transition hover:text-red-600 disabled:opacity-40"
               aria-label="Limpar carrinho"
               onClick={clearCart}
               disabled={items.length === 0}
             >
               <Trash2 size={20} />
             </button>
+          ) : (
+            <span className="h-5 w-5" />
           )}
         </div>
 
-        <div className="px-6 pb-6 max-h-[70vh] overflow-y-auto">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-2 pt-4">
           {step === "carrinho" && (
             <>
               {items.length === 0 ? (
-                <div className="py-10 text-center text-sm text-zinc-500">
-                  Seu carrinho está vazio.
+                <div className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 py-10 text-center text-sm text-neutral-500">
+                  Seu carrinho esta vazio.
                 </div>
               ) : (
                 <>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {items.map((item) => (
                       <CartItem
                         key={item.id}
@@ -150,15 +208,18 @@ export function CartDrawer({ open, onClose }) {
 
                   <CartSummary
                     subtotal={formatPrice(subtotal)}
-                    deliveryText={delivery === 0 ? "Grátis" : formatPrice(delivery)}
+                    deliveryText={
+                      delivery === 0 ? "Gratis" : formatPrice(delivery)
+                    }
                     total={formatPrice(total)}
                   />
 
                   <button
-                    onClick={() => setStep("checkout")}
-                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-pink-600 py-3 font-bold text-white shadow-md transition hover:opacity-90"
+                    type="button"
+                    onClick={handleStartCheckout}
+                    className="mt-5 flex w-full items-center justify-center rounded-md bg-emerald-700 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
                   >
-                    Finalizar Pedido
+                    Finalizar pedido
                   </button>
                 </>
               )}
@@ -167,123 +228,140 @@ export function CartDrawer({ open, onClose }) {
 
           {step === "checkout" && (
             <form className="space-y-4">
-              {/* Nome */}
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-600">Nome</label>
+                <label className="mb-1 block text-sm font-medium text-neutral-700">
+                  Nome
+                </label>
                 <input
                   type="text"
-                  value={cliente.name}
-                  onChange={(e) => setCliente({ ...cliente, name: e.target.value })}
+                  value={customer.name}
+                  onChange={(event) => updateCustomer("name", event.target.value)}
                   placeholder="Informe seu nome"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-pink-500"
+                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
                 />
               </div>
 
-              {/* Telefone */}
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-600">Telefone</label>
+                <label className="mb-1 block text-sm font-medium text-neutral-700">
+                  Telefone
+                </label>
                 <input
                   type="text"
-                  value={cliente.phone}
-                  onChange={(e) => setCliente({ ...cliente, phone: e.target.value })}
-                  placeholder="Informe um telefone válido (com DDD)"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-pink-500"
+                  value={customer.phone}
+                  onChange={(event) =>
+                    updateCustomer("phone", event.target.value)
+                  }
+                  placeholder="Informe um telefone com DDD"
+                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
                 />
               </div>
 
-              {/* Entrega ou Retirada */}
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-600">Entrega ou Retirada</label>
+                <label className="mb-1 block text-sm font-medium text-neutral-700">
+                  Entrega ou retirada
+                </label>
                 <select
                   value={deliveryType}
-                  onChange={(e) => setDeliveryType(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-pink-500"
+                  onChange={(event) => setDeliveryType(event.target.value)}
+                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
                 >
                   <option value="retirada">Retirada no local</option>
                   <option value="entrega">Entrega</option>
                 </select>
               </div>
 
-              {/* Endereço */}
               {deliveryType === "entrega" && (
-                <>
+                <div className="grid grid-cols-[1fr_96px] gap-3">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-600">Rua</label>
+                    <label className="mb-1 block text-sm font-medium text-neutral-700">
+                      Rua
+                    </label>
                     <input
                       type="text"
-                      value={cliente.address}
-                      onChange={(e) => setCliente({ ...cliente, address: e.target.value })}
-                      placeholder="Informe a rua"
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-pink-500"
+                      value={customer.address}
+                      onChange={(event) =>
+                        updateCustomer("address", event.target.value)
+                      }
+                      placeholder="Rua"
+                      className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
                     />
                   </div>
+
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-600">Número</label>
+                    <label className="mb-1 block text-sm font-medium text-neutral-700">
+                      Numero
+                    </label>
                     <input
                       type="text"
-                      value={cliente.house_number}
-                      onChange={(e) => setCliente({ ...cliente, house_number: e.target.value })}
-                      placeholder="Informe o número"
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-pink-500"
+                      value={customer.house_number}
+                      onChange={(event) =>
+                        updateCustomer("house_number", event.target.value)
+                      }
+                      placeholder="100"
+                      className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
                     />
                   </div>
-                </>
+                </div>
               )}
 
-              {/* Pagamento */}
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-600">Forma de pagamento</label>
+                <label className="mb-1 block text-sm font-medium text-neutral-700">
+                  Forma de pagamento
+                </label>
                 <select
                   value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-pink-500"
+                  onChange={(event) => setPaymentMethod(event.target.value)}
+                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
                 >
+                  <option value="pix">Pix</option>
                   <option value="dinheiro">Dinheiro</option>
-                  <option value="cartao">Cartão</option>
+                  <option value="cartao">Cartao</option>
                 </select>
               </div>
 
-              {/* Troco */}
               {paymentMethod === "dinheiro" && (
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-600">Troco</label>
+                  <label className="mb-1 block text-sm font-medium text-neutral-700">
+                    Troco
+                  </label>
                   <input
                     type="number"
                     value={changeAmount}
-                    onChange={(e) => setChangeAmount(e.target.value)}
+                    onChange={(event) => setChangeAmount(event.target.value)}
                     placeholder="Troco para"
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-pink-500"
+                    className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
                   />
                 </div>
               )}
 
-              {/* Observação */}
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-600">Observação</label>
+                <label className="mb-1 block text-sm font-medium text-neutral-700">
+                  Observacao
+                </label>
                 <textarea
-                  value={observacao}
-                  onChange={(e) => setObservacao(e.target.value)}
-                  placeholder="Observação (opcional)"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-pink-500"
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                  placeholder="Observacao opcional"
+                  className="min-h-20 w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
                 />
               </div>
 
-              {/* Botões */}
-              <div className="flex gap-3 mt-4">
+              <div className="flex gap-3 pt-1">
                 <button
                   type="button"
                   onClick={() => setStep("carrinho")}
-                  className="flex-1 rounded-lg border border-zinc-300 py-2 font-semibold text-zinc-700 hover:bg-zinc-100 transition"
+                  className="flex-1 rounded-md border border-neutral-300 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-100"
                 >
                   Voltar
                 </button>
 
                 <button
                   type="button"
-                  onClick={handleSendWhatsApp}
-                  className="flex-1 rounded-lg bg-pink-600 py-2 font-bold text-white hover:opacity-90 transition"
+                  onClick={handleCreateOrder}
+                  disabled={submitting}
+                  className="flex-1 rounded-md bg-emerald-700 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Enviar pelo WhatsApp
+                  {submitting ? "Enviando..." : "Enviar pedido"}
                 </button>
               </div>
             </form>

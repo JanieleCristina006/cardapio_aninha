@@ -12,10 +12,9 @@ export function CartProvider({ children }) {
   }, [items]);
 
   function addToCart(product) {
-    // garante que o produto sempre tenha os campos corretos
     const productToAdd = {
       id: product.id,
-      name: product.name || "Produto",
+      name: product.name || product.title || "Produto",
       price: Number(product.price) || 0,
       description: product.description || "",
       image: product.image || product.image_url || "",

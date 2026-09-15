@@ -1,67 +1,89 @@
 import { useEffect, useState } from "react";
-import { CakeSlice, Croissant, PieChart, Cookie, Flame } from "lucide-react";
+import {
+  Coffee,
+  Gift,
+  LayoutGrid,
+  Package,
+  Star,
+  Utensils,
+} from "lucide-react";
+import { categories as fallbackCategories } from "../../data/catalog";
+import { getCategories } from "../../services/api";
 
-export function CategoryTabs({ active = "doces", onChange }) {
-  const [categories, setCategories] = useState([
-    { id: "doces", label: "Doces", icon: CakeSlice },
-    { id: "bolos", label: "Bolos", icon: Croissant },
-    { id: "tortas", label: "Tortas", icon: PieChart },
-    { id: "salgados", label: "Salgados", icon: Cookie },
-    { id: "combos", label: "Combos", icon: Flame },
-  ]);
+const categoryIcons = {
+  todos: LayoutGrid,
+  destaques: Star,
+  produtos: Package,
+  refeicoes: Utensils,
+  bebidas: Coffee,
+  kits: Gift,
+};
 
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) return;
+function formatLabel(label) {
+  if (!label) return "Categoria";
+  return String(label).charAt(0).toUpperCase() + String(label).slice(1);
+}
 
-  fetch("https://ecommerce-api-4k6g.onrender.com/api/v1/categories/", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then(async (res) => {
-      const text = await res.text();
-      console.log("Resposta bruta da API:", text); // mostra exatamente o que veio
+export function CategoryTabs({
+  active = "todos",
+  onChange,
+  onCategoriesLoaded,
+}) {
+  const [categories, setCategories] = useState(fallbackCategories);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadCategories() {
       try {
-        const data = JSON.parse(text);
-        console.log("Categorias da API:", data);
-      } catch (err) {
-        console.error("Erro ao parsear JSON:", err);
+        const apiCategories = await getCategories();
+        if (ignore || apiCategories.length === 0) return;
+
+        const nextCategories = [
+          fallbackCategories[0],
+          ...apiCategories.map((category) => ({
+            ...category,
+            label: formatLabel(category.label),
+          })),
+        ];
+
+        setCategories(nextCategories);
+        onCategoriesLoaded?.(nextCategories);
+      } catch {
+        onCategoriesLoaded?.(fallbackCategories);
       }
-    })
-    .catch((err) => console.error("Erro ao buscar categorias:", err));
-}, []);
+    }
+
+    loadCategories();
+
+    return () => {
+      ignore = true;
+    };
+  }, [onCategoriesLoaded]);
+
   return (
     <section className="mt-8">
-      <div className="flex gap-6 overflow-x-auto pb-2">
-        {categories.map((cat) => {
-          const Icon = cat.icon;
-          const isActive = active === cat.id;
+      <div className="flex gap-3 overflow-x-auto pb-2">
+        {categories.map((category) => {
+          const Icon = categoryIcons[category.id] || Package;
+          const isActive = String(active) === String(category.id);
 
           return (
             <button
-              key={cat.id}
-              onClick={() => onChange?.(cat.id)}
-              className="shrink-0 flex flex-col items-center gap-3"
+              key={category.id}
+              type="button"
+              onClick={() => onChange?.(category.id)}
+              className={[
+                "flex min-w-24 shrink-0 flex-col items-center gap-2 rounded-lg border px-3 py-3 transition",
+                isActive
+                  ? "border-slate-900 bg-slate-900 text-white"
+                  : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300 hover:text-neutral-950",
+              ].join(" ")}
             >
-              <div
-                className={[
-                  "h-16 w-16 rounded-full flex items-center justify-center border transition",
-                  isActive
-                    ? "bg-pink-600 border-pink-600 text-white shadow-md"
-                    : "bg-white border-pink-100 text-zinc-800",
-                ].join(" ")}
-              >
-                <Icon size={26} strokeWidth={2.2} />
-              </div>
+              <Icon size={22} strokeWidth={2.1} />
 
-              <span
-                className={[
-                  "text-lg font-semibold",
-                  isActive ? "text-pink-600" : "text-zinc-800",
-                ].join(" ")}
-              >
-                {cat.label}
+              <span className="text-sm font-semibold leading-none">
+                {category.label}
               </span>
             </button>
           );

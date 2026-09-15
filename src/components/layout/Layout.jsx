@@ -1,35 +1,25 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { Header } from "./Header";
+import { CartDrawer } from "../cart/CartDrawer";
 import { BottomNavigation } from "./BottomNavigation";
-import { CartDrawer } from "../cart/CartDrawer"; // ajuste o caminho
+import { Header } from "./Header";
 
 export const Layout = () => {
   const [openCart, setOpenCart] = useState(false);
 
   return (
-    <div className="h-screen bg-neutral-100">
-      
-      {/* HEADER */}
-      <div className="fixed top-0 left-0 w-full z-50">
+    <div className="min-h-screen bg-neutral-100">
+      <div className="fixed left-0 top-0 z-50 w-full">
         <Header />
       </div>
 
-      {/* CONTEÚDO */}
-      <main className="h-full overflow-y-auto pt-20 pb-28 px-3">
+      <main className="min-h-screen pt-20 pb-28">
         <Outlet />
       </main>
 
-      {/* BOTTOM */}
-      <div className="fixed bottom-0 left-0 w-full z-50 flex justify-center">
-        <BottomNavigation onCartClick={() => setOpenCart(true)} />
-      </div>
+      <BottomNavigation onCartClick={() => setOpenCart(true)} />
 
-      {/* 🔥 CARRINHO */}
-      <CartDrawer
-        open={openCart}
-        onClose={() => setOpenCart(false)}
-      />
+      <CartDrawer open={openCart} onClose={() => setOpenCart(false)} />
     </div>
   );
 };

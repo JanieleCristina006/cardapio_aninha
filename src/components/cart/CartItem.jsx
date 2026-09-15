@@ -9,54 +9,53 @@ function formatPrice(value) {
 
 export function CartItem({ item, onDecrease, onIncrease, onRemove }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-zinc-100 bg-white p-3 shadow-sm">
-      {/* Imagem do produto */}
+    <div className="flex items-center gap-3 rounded-lg border border-neutral-200 bg-white p-3 shadow-sm">
       <img
-        src={item.image || item.image_url} // fallback caso seja image_url
+        src={item.image || item.image_url}
         alt={item.name}
-        className="h-14 w-14 rounded-xl object-cover"
+        className="h-14 w-14 rounded-md object-cover"
       />
 
-      {/* Info do produto */}
       <div className="min-w-0 flex-1">
-        <h4 className="truncate text-sm font-bold text-zinc-800">
+        <h4 className="truncate text-sm font-semibold text-neutral-950">
           {item.name}
         </h4>
-        <p className="truncate text-xs text-zinc-500">
-          {item.description || "Sem descrição"}
+        <p className="truncate text-xs text-neutral-500">
+          {item.description || "Sem descricao"}
         </p>
-        <p className="mt-1 text-sm font-extrabold text-pink-600">
-          {formatPrice(Number(item.price))}
+        <p className="mt-1 text-sm font-bold text-neutral-950">
+          {formatPrice(item.price)}
         </p>
       </div>
 
-      {/* Controles de quantidade */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <button
+          type="button"
           onClick={onDecrease}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-pink-50 text-pink-600 transition hover:bg-pink-100"
+          className="grid h-8 w-8 place-items-center rounded-md bg-neutral-100 text-neutral-700 transition hover:bg-neutral-200"
           aria-label={`Diminuir quantidade de ${item.name}`}
         >
-          <Minus size={16} />
+          <Minus size={15} />
         </button>
 
-        <span className="w-5 text-center font-semibold text-zinc-800">
+        <span className="w-6 text-center text-sm font-semibold text-neutral-900">
           {item.qty}
         </span>
 
         <button
+          type="button"
           onClick={onIncrease}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-pink-600 text-white transition hover:opacity-90"
+          className="grid h-8 w-8 place-items-center rounded-md bg-emerald-700 text-white transition hover:bg-emerald-800"
           aria-label={`Aumentar quantidade de ${item.name}`}
         >
-          <Plus size={16} />
+          <Plus size={15} />
         </button>
       </div>
 
-      {/* Botão remover */}
       <button
+        type="button"
         onClick={onRemove}
-        className="text-zinc-400 transition hover:text-red-500"
+        className="text-neutral-400 transition hover:text-red-600"
         aria-label={`Remover ${item.name} do carrinho`}
       >
         <Trash2 size={16} />

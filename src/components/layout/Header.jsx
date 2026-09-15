@@ -1,28 +1,41 @@
-import { Menu, User, LogOut } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { LogOut, ShoppingBag, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  business,
+  defaultProfile,
+  PROFILE_STORAGE_KEY,
+} from "../../data/catalog";
+import { clearAuthSession } from "../../services/api";
+
+function readProfile() {
+  try {
+    const storedProfile = localStorage.getItem(PROFILE_STORAGE_KEY);
+    return storedProfile ? JSON.parse(storedProfile) : defaultProfile;
+  } catch {
+    return defaultProfile;
+  }
+}
 
 export function Header() {
   const navigate = useNavigate();
-  const location = useLocation(); // pega a rota atual
-  const [usuario, setUsuario] = useState(null);
+  const location = useLocation();
+  const [profile, setProfile] = useState(readProfile);
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    function handleProfileUpdate() {
+      setProfile(readProfile());
+    }
 
-    fetch("https://ecommerce-api-4k6g.onrender.com/api/v1/customers/", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.results && data.results.length > 0) {
-          setUsuario(data.results[0]);
-        }
-      })
-      .catch((err) => console.error("Erro ao buscar usuário:", err));
+    window.addEventListener("profile-updated", handleProfileUpdate);
+    window.addEventListener("storage", handleProfileUpdate);
+
+    return () => {
+      window.removeEventListener("profile-updated", handleProfileUpdate);
+      window.removeEventListener("storage", handleProfileUpdate);
+    };
   }, []);
 
   useEffect(() => {
@@ -31,87 +44,91 @@ export function Header() {
         setOpenDropdown(false);
       }
     }
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  function handleLogout() {
+    clearAuthSession();
+    setOpenDropdown(false);
     navigate("/login");
-  };
+  }
 
   return (
-    <header className="w-full bg-white px-4 py-4 shadow-sm flex items-center justify-between">
-      {/* ESQUERDA */}
-      <div className="flex items-center gap-3">
-        <button className="text-pink-500">
-          <Menu size={26} strokeWidth={2.5} />
-        </button>
-        <h1 className="text-lg sm:text-xl font-bold text-zinc-800">
-          Aninha Doces
-        </h1>
-      </div>
-
-      {/* DIREITA - USUÁRIO */}
-      <div className="relative" ref={dropdownRef}>
+    <header className="w-full border-b border-neutral-200 bg-white px-4 py-3 shadow-sm">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
         <button
-          onClick={() => setOpenDropdown(!openDropdown)}
-          className="flex items-center gap-2 rounded-full bg-zinc-100 px-2 py-1 pr-3 transition hover:bg-zinc-200"
+          type="button"
+          onClick={() => navigate("/")}
+          className="flex min-w-0 items-center gap-3 text-left"
         >
-          {/* FOTO */}
-          <div className="h-9 w-9 overflow-hidden rounded-full border">
-            {usuario?.avatar_url ? (
-              <img
-                src={usuario.avatar_url}
-                alt="avatar"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
-                :)
-              </div>
-            )}
-          </div>
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-slate-900 text-white">
+            <ShoppingBag size={21} strokeWidth={2.3} />
+          </span>
 
-          {/* NOME */}
-          <span className="hidden sm:block text-sm font-medium text-zinc-700">
-            {usuario?.name?.split(" ")[0] || "Usuário"}
+          <span className="min-w-0">
+            <span className="block truncate text-base font-bold text-neutral-950 sm:text-lg">
+              {business.name}
+            </span>
+            <span className="hidden truncate text-xs text-neutral-500 sm:block">
+              {business.tagline}
+            </span>
           </span>
         </button>
 
-        {/* DROPDOWN */}
-        {openDropdown && (
-          <div className="absolute right-0 mt-2 w-40 rounded-lg bg-white shadow-lg border z-50 overflow-hidden animate-fadeIn">
-            <button
-              onClick={() => navigate("/perfil")}
-              className={`flex items-center gap-2 w-full px-4 py-2 transition ${
-                location.pathname === "/perfil"
-                  ? "bg-pink-100 font-semibold"
-                  : "text-zinc-700 hover:bg-pink-50"
-              }`}
-            >
-              <User size={18} /> Perfil
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-4 py-2 text-zinc-700 hover:bg-pink-50 transition"
-            >
-              <LogOut size={18} /> Sair
-            </button>
-          </div>
-        )}
-      </div>
+        <div className="relative" ref={dropdownRef}>
+          <button
+            type="button"
+            onClick={() => setOpenDropdown((value) => !value)}
+            className="flex items-center gap-2 rounded-md border border-neutral-200 bg-white px-2 py-1.5 transition hover:bg-neutral-50"
+          >
+            <div className="grid h-8 w-8 overflow-hidden rounded-md bg-neutral-100 text-neutral-500">
+              {profile.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt="Avatar"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <User size={17} className="m-auto" />
+              )}
+            </div>
 
-   
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          .animate-fadeIn { animation: fadeIn 0.2s ease-out; }
-        `}
-      </style>
+            <span className="hidden max-w-28 truncate text-sm font-medium text-neutral-700 sm:block">
+              {profile.name?.split(" ")[0] || "Cliente"}
+            </span>
+          </button>
+
+          {openDropdown && (
+            <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-lg">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenDropdown(false);
+                  navigate("/perfil");
+                }}
+                className={[
+                  "flex w-full items-center gap-2 px-4 py-2 text-sm transition",
+                  location.pathname === "/perfil"
+                    ? "bg-emerald-50 font-semibold text-emerald-800"
+                    : "text-neutral-700 hover:bg-neutral-50",
+                ].join(" ")}
+              >
+                <User size={17} /> Perfil
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-neutral-700 transition hover:bg-neutral-50"
+              >
+                <LogOut size={17} /> Sair
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </header>
   );
 }

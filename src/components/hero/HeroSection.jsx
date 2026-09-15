@@ -1,39 +1,50 @@
+import { ArrowDown, ShoppingBag } from "lucide-react";
+import { business } from "../../data/catalog";
+
 export function HeroSection() {
+  function handleScrollToCatalog() {
+    document
+      .getElementById("catalogo")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
-    <section className="mt-2">
-      <div className="relative overflow-hidden rounded-3xl min-h-90 sm:min-h-105">
-        {/* Background image */}
+    <section className="pt-2">
+      <div className="relative min-h-[260px] overflow-hidden rounded-lg border border-neutral-200 bg-neutral-900">
         <img
-          src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=1200&q=80"
-          alt="Bolo com morangos"
+          src={business.heroImage}
+          alt="Vitrine de produtos"
           className="absolute inset-0 h-full w-full object-cover"
         />
 
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
 
-        {/* Content */}
-        <div className="relative z-10 p-6 sm:p-8 flex h-full items-end">
-          <div className="max-w-lg">
-            <h2 className="text-white font-extrabold leading-[1.05] text-4xl sm:text-5xl">
-              Delícias que
-              <br />
-              Encantam o
-              <br />
-              Coração
-            </h2>
+        <div className="relative z-10 flex min-h-[260px] items-end p-5 sm:p-7">
+          <div className="max-w-xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-md bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-800">
+              <ShoppingBag size={14} />
+              {business.eyebrow}
+            </div>
 
-            <p className="mt-4 text-white/85 text-base sm:text-lg leading-relaxed">
-              Doces artesanais feitos com amor e os melhores ingredientes da
-              região.
+            <h1 className="text-3xl font-bold leading-tight text-white sm:text-5xl">
+              {business.name}
+            </h1>
+
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/85 sm:text-base">
+              {business.description}
             </p>
 
-            <button className="mt-6 inline-flex items-center justify-center rounded-2xl bg-pink-600 px-7 py-4 text-white font-semibold text-lg shadow-lg active:scale-[0.98] transition">
-              Ver Cardápio
+            <button
+              type="button"
+              onClick={handleScrollToCatalog}
+              className="mt-5 inline-flex items-center gap-2 rounded-md bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+            >
+              Ver catalogo
+              <ArrowDown size={16} />
             </button>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,46 +1,35 @@
 import { useState } from "react"
 import { useCart } from "../hooks/useCart"
+import { categories } from "../data/catalog"
 
-import { Header } from "../components/layout/Header"
 import { HeroSection } from "../components/hero/HeroSection"
 import { StoreStatus } from "../components/store/StoreStatus"
-import { PartnersSection } from "../components/partners/PartnersSection"
+import { HighlightsSection } from "../components/highlights/HighlightsSection"
 import { CategoryTabs } from "../components/products/CategoryTabs"
-import { FeaturedProducts } from "../components/products/FeaturedProducts"
-import { BottomNavigation } from "../components/layout/BottomNavigation"
-import { CartDrawer } from "../components/cart/CartDrawer"
+import { ProductCatalog } from "../components/products/ProductCatalog"
 
 export function Home() {
-  const [activeCategory, setActiveCategory] = useState("doces")
-  const [cartOpen, setCartOpen] = useState(false)
+  const [activeCategory, setActiveCategory] = useState("todos")
+  const [categoryOptions, setCategoryOptions] = useState(categories)
 
   const { addToCart } = useCart()
 
   return (
-    <div className="relative min-h-screen bg-neutral-100">
-      <div className="mx-auto w-full max-w-6xl px-4 pb-28 sm:px-6 lg:px-8">
-        <HeroSection />
-        <StoreStatus />
-        <PartnersSection />
+    <div className="mx-auto w-full max-w-6xl px-4 pb-28 sm:px-6 lg:px-8">
+      <HeroSection />
+      <StoreStatus />
+      <HighlightsSection />
 
-        <CategoryTabs
-          active={activeCategory}
-          onChange={setActiveCategory}
-        />
+      <CategoryTabs
+        active={activeCategory}
+        onChange={setActiveCategory}
+        onCategoriesLoaded={setCategoryOptions}
+      />
 
-        <FeaturedProducts onAddToCart={addToCart} />
-      </div>
-
-      <div className="">
-        <BottomNavigation
-          active="home"
-          onCartClick={() => setCartOpen(true)}
-        />
-      </div>
-
-      <CartDrawer
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
+      <ProductCatalog
+        activeCategory={activeCategory}
+        categories={categoryOptions}
+        onAddToCart={addToCart}
       />
     </div>
   )
