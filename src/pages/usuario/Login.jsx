@@ -38,10 +38,10 @@ export const Login = () => {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-200 px-4 py-8">
+    <div className="relative flex h-dvh items-center justify-center overflow-hidden bg-neutral-200 px-4 py-3 sm:py-4">
       <div className="absolute -bottom-24 -right-20 h-56 w-56 rounded-full bg-blue-500" />
 
-      <div className="relative z-10 flex min-h-[650px] w-full max-w-sm flex-col rounded-[2.5rem] bg-white px-6 py-10 shadow-sm sm:px-8">
+      <div className="relative z-10 flex h-full max-h-[650px] w-full max-w-sm flex-col rounded-[2.5rem] bg-white px-6 py-6 shadow-sm sm:px-8 sm:py-8">
         <div className="mx-auto flex flex-col items-center">
           <div
             className="relative flex h-24 w-28 items-end justify-center gap-1"
