@@ -109,7 +109,7 @@ function EditProfileModalContent({ onClose, usuario, onUpdate }) {
                 )}
               </div>
 
-              <div className="absolute bottom-0 right-0 rounded-md bg-emerald-700 p-2 text-white shadow-sm">
+              <div className="absolute bottom-0 right-0 rounded-md bg-blue-700 p-2 text-white shadow-sm">
                 <Camera size={16} />
               </div>
 
@@ -129,7 +129,7 @@ function EditProfileModalContent({ onClose, usuario, onUpdate }) {
                 value={form.first_name}
                 onChange={handleChange}
                 placeholder="Nome"
-                className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
               />
 
               <input
@@ -137,7 +137,7 @@ function EditProfileModalContent({ onClose, usuario, onUpdate }) {
                 value={form.last_name}
                 onChange={handleChange}
                 placeholder="Sobrenome"
-                className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
               />
             </div>
 
@@ -146,7 +146,7 @@ function EditProfileModalContent({ onClose, usuario, onUpdate }) {
               value={form.phone}
               onChange={handleChange}
               placeholder="Telefone"
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
             />
 
             <input
@@ -154,7 +154,7 @@ function EditProfileModalContent({ onClose, usuario, onUpdate }) {
               value={form.address}
               onChange={handleChange}
               placeholder="Endereco"
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
             />
 
             <input
@@ -162,13 +162,13 @@ function EditProfileModalContent({ onClose, usuario, onUpdate }) {
               value={form.house_number}
               onChange={handleChange}
               placeholder="Numero"
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md bg-emerald-700 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-md bg-blue-700 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Salvando..." : "Salvar alteracoes"}
             </button>

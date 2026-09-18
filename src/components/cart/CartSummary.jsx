@@ -8,7 +8,7 @@ export function CartSummary({ subtotal, deliveryText = "Gratis", total }) {
 
       <div className="mt-2 flex items-center justify-between text-sm text-neutral-600">
         <span>Taxa de entrega</span>
-        <span className="font-semibold text-emerald-700">{deliveryText}</span>
+        <span className="font-semibold text-blue-700">{deliveryText}</span>
       </div>
 
       <div className="mt-4 flex items-end justify-between border-t border-neutral-200 pt-4">

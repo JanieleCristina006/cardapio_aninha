@@ -34,14 +34,14 @@ export function BottomNavigation({ onCartClick }) {
             }}
             className={[
               "relative flex min-w-16 flex-col items-center gap-1 text-xs font-medium transition",
-              isActive ? "text-emerald-700" : "text-neutral-400 hover:text-neutral-700",
+              isActive ? "text-blue-700" : "text-neutral-400 hover:text-neutral-700",
             ].join(" ")}
           >
             <Icon size={21} />
             <span>{item.label}</span>
 
             {isCart && totalItems > 0 && (
-              <span className="absolute -right-1 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-700 px-1 text-[10px] font-bold text-white shadow-sm">
+              <span className="absolute -right-1 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-700 px-1 text-[10px] font-bold text-white shadow-sm">
                 {totalItems}
               </span>
             )}

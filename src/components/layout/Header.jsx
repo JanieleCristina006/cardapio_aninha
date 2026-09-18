@@ -111,7 +111,7 @@ export function Header() {
                 className={[
                   "flex w-full items-center gap-2 px-4 py-2 text-sm transition",
                   location.pathname === "/perfil"
-                    ? "bg-emerald-50 font-semibold text-emerald-800"
+                    ? "bg-blue-50 font-semibold text-blue-800"
                     : "text-neutral-700 hover:bg-neutral-50",
                 ].join(" ")}
               >

@@ -6,7 +6,7 @@ export function HighlightsSection() {
     <section className="mt-8">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
+          <p className="text-xs font-semibold uppercase tracking-wider text-blue-700">
             Operacao
           </p>
           <h2 className="mt-1 text-xl font-bold text-neutral-950">

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Camera, CircleUserRound, Eye, EyeOff, Pencil } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { business } from "../../data/catalog";
 import {
   getCustomerProfile,
   loginCustomer,
@@ -22,6 +22,7 @@ export const Cadastrar = () => {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleChange(event) {
     setForm({
@@ -59,126 +60,169 @@ export const Cadastrar = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-100 px-3 sm:px-4">
-      <div className="w-full max-w-md rounded-lg border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-        <p className="text-center text-xs font-semibold uppercase tracking-wider text-emerald-700">
-          {business.name}
-        </p>
-        <h1 className="mt-2 text-center text-2xl font-bold text-neutral-950">
-          Criar perfil
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-200 px-4 py-8">
+      <div className="absolute -left-24 -top-24 h-56 w-56 rounded-full bg-blue-500" />
+
+      <div className="relative z-10 flex min-h-[650px] w-full max-w-sm flex-col rounded-[2.5rem] bg-white px-6 py-10 shadow-sm sm:px-8">
+        <h1 className="mt-4 text-center text-2xl font-bold text-neutral-950">
+          Criar conta
         </h1>
+        <p className="mt-2 text-center text-sm text-neutral-600">
+          Cadastre-se para acompanhar seus pedidos.
+        </p>
 
-        <div className="mt-6 flex flex-col items-center">
-          <label className="cursor-pointer">
-            <div className="relative h-20 w-20 overflow-hidden rounded-lg border-2 border-dashed border-neutral-300 transition hover:border-emerald-600 sm:h-24 sm:w-24">
-              {preview ? (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
-                  Foto
-                </span>
-              )}
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div className="flex justify-center">
+            <label
+              className="relative block cursor-pointer"
+              aria-label="Escolher foto de perfil"
+            >
+              <span className="grid h-24 w-24 overflow-hidden rounded-full border border-neutral-300 bg-neutral-50 text-neutral-400 shadow-sm transition hover:border-blue-500">
+                {preview ? (
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <Camera size={24} className="m-auto" />
+                )}
+              </span>
+              <span className="absolute bottom-0 right-0 grid h-8 w-8 place-items-center rounded-full border-2 border-white bg-blue-700 text-white shadow-sm transition hover:bg-blue-800">
+                <Pencil size={14} />
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImage}
+              />
+            </label>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-base font-medium text-neutral-950">
+              Nome
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                name="first_name"
+                type="text"
+                value={form.first_name}
+                placeholder="Nome"
+                onChange={handleChange}
+                className="h-11 w-full rounded-md border border-neutral-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              />
+
+              <input
+                name="last_name"
+                type="text"
+                value={form.last_name}
+                placeholder="Sobrenome"
+                onChange={handleChange}
+                className="h-11 w-full rounded-md border border-neutral-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              />
             </div>
+          </div>
 
+          <div>
+            <label className="mb-2 block text-base font-medium text-neutral-950">
+              Email
+            </label>
             <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImage}
-            />
-          </label>
-        </div>
-
-        <form onSubmit={handleSubmit} className="mt-5 space-y-3">
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            placeholder="Email"
-            onChange={handleChange}
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 sm:text-base"
-            required
-          />
-
-          <input
-            name="password"
-            type="password"
-            value={form.password}
-            placeholder="Senha"
-            onChange={handleChange}
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 sm:text-base"
-            required
-          />
-
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              name="first_name"
-              type="text"
-              value={form.first_name}
-              placeholder="Nome"
+              name="email"
+              type="email"
+              value={form.email}
+              placeholder="seu@email.com"
               onChange={handleChange}
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 sm:text-base"
-              required
-            />
-
-            <input
-              name="last_name"
-              type="text"
-              value={form.last_name}
-              placeholder="Sobrenome"
-              onChange={handleChange}
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 sm:text-base"
+              className="h-11 w-full rounded-md border border-neutral-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               required
             />
           </div>
 
-          <input
-            name="telephone"
-            type="text"
-            value={form.telephone}
-            placeholder="Telefone"
-            onChange={handleChange}
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 sm:text-base"
-          />
+          <div>
+            <label className="mb-2 block text-base font-medium text-neutral-950">
+              Senha
+            </label>
+            <div className="relative">
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                placeholder="Digite sua senha"
+                onChange={handleChange}
+                className="h-11 w-full rounded-md border border-neutral-300 px-3 pr-11 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="absolute inset-y-0 right-3 grid place-items-center text-neutral-600 transition hover:text-neutral-950"
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
 
-          <div className="grid grid-cols-[1fr_88px] gap-2">
+          <div>
+            <label className="mb-2 block text-base font-medium text-neutral-950">
+              Telefone
+            </label>
             <input
-              name="address"
+              name="telephone"
               type="text"
-              value={form.address}
-              placeholder="Endereco"
+              value={form.telephone}
+              placeholder="Telefone"
               onChange={handleChange}
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 sm:text-base"
-            />
-
-            <input
-              name="house_number"
-              type="text"
-              value={form.house_number}
-              placeholder="N."
-              onChange={handleChange}
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 sm:text-base"
+              className="h-11 w-full rounded-md border border-neutral-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-emerald-700 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 sm:text-base"
-          >
-            {loading ? "Criando..." : "Criar perfil"}
-          </button>
+          <div>
+            <label className="mb-2 block text-base font-medium text-neutral-950">
+              Endereco
+            </label>
+            <div className="grid grid-cols-[1fr_86px] gap-2">
+              <input
+                name="address"
+                type="text"
+                value={form.address}
+                placeholder="Rua"
+                onChange={handleChange}
+                className="h-11 w-full rounded-md border border-neutral-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
+
+              <input
+                name="house_number"
+                type="text"
+                value={form.house_number}
+                placeholder="N."
+                onChange={handleChange}
+                className="h-11 w-full rounded-md border border-neutral-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-blue-700 px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <CircleUserRound size={16} />
+              {loading ? "Criando..." : "Criar perfil"}
+            </button>
+          </div>
         </form>
 
-        <div className="mt-5 text-center text-sm text-neutral-600">
-          Ja tem perfil?{" "}
+        <div className="mt-auto pt-8 text-center text-xs text-neutral-700">
+          Ja tem uma conta?{" "}
           <Link
             to="/login"
-            className="font-medium text-emerald-700 hover:text-emerald-800"
+            className="font-semibold text-blue-700 hover:text-blue-800"
           >
             Entrar
           </Link>

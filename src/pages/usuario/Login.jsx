@@ -1,5 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { business } from "../../data/catalog";
 import { getCustomerProfile, loginCustomer } from "../../services/api";
@@ -11,6 +12,7 @@ export const Login = () => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleChange(event) {
     setForm({
@@ -36,18 +38,39 @@ export const Login = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-100 px-4">
-      <div className="w-full max-w-md rounded-lg border border-neutral-200 bg-white p-6 shadow-sm">
-        <p className="text-center text-xs font-semibold uppercase tracking-wider text-emerald-700">
-          {business.name}
-        </p>
-        <h1 className="mt-2 text-center text-2xl font-bold text-neutral-950">
-          Entrar
-        </h1>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-200 px-4 py-8">
+      <div className="absolute -bottom-24 -right-20 h-56 w-56 rounded-full bg-blue-500" />
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <div className="relative z-10 flex min-h-[650px] w-full max-w-sm flex-col rounded-[2.5rem] bg-white px-6 py-10 shadow-sm sm:px-8">
+        <div className="mx-auto flex flex-col items-center">
+          <div
+            className="relative flex h-24 w-28 items-end justify-center gap-1"
+            aria-label="Logo ficticia"
+          >
+            <span className="mb-4 h-9 w-7 rounded-t-md bg-blue-200 shadow-sm" />
+            <span className="mb-3 h-12 w-7 rounded-md bg-blue-500 shadow-sm" />
+            <span className="mb-4 h-10 w-7 rounded-t-md bg-blue-200 shadow-sm" />
+            <span className="absolute left-8 top-1 h-12 w-px rotate-[-22deg] bg-slate-300" />
+            <span className="absolute right-8 top-0 h-14 w-px rotate-[18deg] bg-slate-300" />
+            <span className="absolute left-10 top-4 h-1.5 w-1.5 rounded-full bg-slate-400" />
+            <span className="absolute right-10 top-5 h-1.5 w-1.5 rounded-full bg-slate-400" />
+          </div>
+
+          <p className="-mt-2 text-center text-sm font-semibold uppercase tracking-widest text-blue-700">
+            {business.name}
+          </p>
+        </div>
+
+        <h1 className="mt-9 text-center text-2xl font-bold text-neutral-950">
+          Bem-vindo de volta!
+        </h1>
+        <p className="mt-2 text-center text-sm text-neutral-600">
+          Entre para continuar seu pedido.
+        </p>
+
+        <form onSubmit={handleSubmit} className="mt-9 space-y-5">
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-2 block text-base font-medium text-neutral-950">
               Email
             </label>
             <input
@@ -56,49 +79,61 @@ export const Login = () => {
               value={form.email}
               placeholder="seu@email.com"
               onChange={handleChange}
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+              className="h-11 w-full rounded-md border border-neutral-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               required
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-2 block text-base font-medium text-neutral-950">
               Senha
             </label>
-            <input
-              name="password"
-              type="password"
-              value={form.password}
-              placeholder="Digite sua senha"
-              onChange={handleChange}
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
-              required
-            />
+            <div className="relative">
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                placeholder="Digite sua senha"
+                onChange={handleChange}
+                className="h-11 w-full rounded-md border border-neutral-300 px-3 pr-11 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="absolute inset-y-0 right-3 grid place-items-center text-neutral-600 transition hover:text-neutral-950"
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            <div className="mt-2 text-right">
+              <button
+                type="button"
+                className="text-xs font-medium text-neutral-600 transition hover:text-neutral-950"
+              >
+                Esqueceu sua senha?
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between gap-4 pt-2">
-            <Link
-              to="/"
-              className="text-sm font-medium text-neutral-500 hover:text-neutral-800"
-            >
-              Voltar
-            </Link>
-
+          <div className="pt-5">
             <button
               type="submit"
               disabled={loading}
-              className="rounded-md bg-emerald-700 px-5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-blue-700 px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
+              <LogIn size={16} />
               {loading ? "Entrando..." : "Entrar"}
             </button>
           </div>
         </form>
 
-        <div className="mt-6 text-center text-sm text-neutral-600">
-          Ainda nao tem cadastro?{" "}
+        <div className="mt-auto pt-10 text-center text-xs text-neutral-700">
+          Ainda nao tem uma conta?{" "}
           <Link
             to="/cadastrar"
-            className="font-medium text-emerald-700 hover:text-emerald-800"
+            className="font-semibold text-blue-700 hover:text-blue-800"
           >
             Criar perfil
           </Link>

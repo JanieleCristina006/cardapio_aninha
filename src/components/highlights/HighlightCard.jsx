@@ -18,7 +18,7 @@ export function HighlightCard({ image, title, description }) {
           {description}
         </p>
 
-        <button className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-emerald-700 transition hover:text-emerald-800">
+        <button className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-blue-700 transition hover:text-blue-800">
           Detalhes <ArrowRight size={16} />
         </button>
       </div>

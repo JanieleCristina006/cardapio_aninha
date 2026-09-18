@@ -45,7 +45,7 @@ export function CartItem({ item, onDecrease, onIncrease, onRemove }) {
         <button
           type="button"
           onClick={onIncrease}
-          className="grid h-8 w-8 place-items-center rounded-md bg-emerald-700 text-white transition hover:bg-emerald-800"
+          className="grid h-8 w-8 place-items-center rounded-md bg-blue-700 text-white transition hover:bg-blue-800"
           aria-label={`Aumentar quantidade de ${item.name}`}
         >
           <Plus size={15} />

@@ -217,7 +217,7 @@ export function CartDrawer({ open, onClose }) {
                   <button
                     type="button"
                     onClick={handleStartCheckout}
-                    className="mt-5 flex w-full items-center justify-center rounded-md bg-emerald-700 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+                    className="mt-5 flex w-full items-center justify-center rounded-md bg-blue-700 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800"
                   >
                     Finalizar pedido
                   </button>
@@ -237,7 +237,7 @@ export function CartDrawer({ open, onClose }) {
                   value={customer.name}
                   onChange={(event) => updateCustomer("name", event.target.value)}
                   placeholder="Informe seu nome"
-                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
                 />
               </div>
 
@@ -252,7 +252,7 @@ export function CartDrawer({ open, onClose }) {
                     updateCustomer("phone", event.target.value)
                   }
                   placeholder="Informe um telefone com DDD"
-                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
                 />
               </div>
 
@@ -263,7 +263,7 @@ export function CartDrawer({ open, onClose }) {
                 <select
                   value={deliveryType}
                   onChange={(event) => setDeliveryType(event.target.value)}
-                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
                 >
                   <option value="retirada">Retirada no local</option>
                   <option value="entrega">Entrega</option>
@@ -283,7 +283,7 @@ export function CartDrawer({ open, onClose }) {
                         updateCustomer("address", event.target.value)
                       }
                       placeholder="Rua"
-                      className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                      className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
                     />
                   </div>
 
@@ -298,7 +298,7 @@ export function CartDrawer({ open, onClose }) {
                         updateCustomer("house_number", event.target.value)
                       }
                       placeholder="100"
-                      className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                      className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
                     />
                   </div>
                 </div>
@@ -311,7 +311,7 @@ export function CartDrawer({ open, onClose }) {
                 <select
                   value={paymentMethod}
                   onChange={(event) => setPaymentMethod(event.target.value)}
-                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                  className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
                 >
                   <option value="pix">Pix</option>
                   <option value="dinheiro">Dinheiro</option>
@@ -329,7 +329,7 @@ export function CartDrawer({ open, onClose }) {
                     value={changeAmount}
                     onChange={(event) => setChangeAmount(event.target.value)}
                     placeholder="Troco para"
-                    className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                    className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
                   />
                 </div>
               )}
@@ -342,7 +342,7 @@ export function CartDrawer({ open, onClose }) {
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}
                   placeholder="Observacao opcional"
-                  className="min-h-20 w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-emerald-600"
+                  className="min-h-20 w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:border-blue-600"
                 />
               </div>
 
@@ -359,7 +359,7 @@ export function CartDrawer({ open, onClose }) {
                   type="button"
                   onClick={handleCreateOrder}
                   disabled={submitting}
-                  className="flex-1 rounded-md bg-emerald-700 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex-1 rounded-md bg-blue-700 py-2 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {submitting ? "Enviando..." : "Enviar pedido"}
                 </button>

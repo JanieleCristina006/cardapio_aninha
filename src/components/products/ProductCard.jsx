@@ -78,7 +78,7 @@ export function ProductCard({
             <button
               type="button"
               onClick={() => setExpanded((value) => !value)}
-              className="mt-2 w-fit text-sm font-medium text-emerald-700 hover:text-emerald-800"
+              className="mt-2 w-fit text-sm font-medium text-blue-700 hover:text-blue-800"
             >
               {expanded ? "Ver menos" : "Ver mais"}
             </button>
@@ -117,7 +117,7 @@ export function ProductCard({
               <button
                 type="button"
                 onClick={handleAdd}
-                className="inline-flex h-10 items-center gap-2 rounded-md bg-emerald-700 px-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                className="inline-flex h-10 items-center gap-2 rounded-md bg-blue-700 px-3 text-sm font-semibold text-white transition hover:bg-blue-800"
                 aria-label={`Adicionar ${qty} de ${productName} ao carrinho`}
               >
                 <ShoppingCart size={16} />

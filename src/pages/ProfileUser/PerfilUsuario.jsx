@@ -97,7 +97,7 @@ export const PerfilUsuario = ({
           type="button"
           onClick={onEdit}
           disabled={loading}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-emerald-700 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-blue-700 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800"
         >
           <Pencil size={16} />
           Editar perfil
@@ -107,7 +107,7 @@ export const PerfilUsuario = ({
       <div className="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
+            <p className="text-xs font-semibold uppercase tracking-wider text-blue-700">
               Compras
             </p>
             <h3 className="mt-1 text-lg font-bold text-neutral-950">
@@ -152,7 +152,7 @@ export const PerfilUsuario = ({
                     </div>
                   </div>
 
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
                     {order.status}
                   </span>
                 </div>

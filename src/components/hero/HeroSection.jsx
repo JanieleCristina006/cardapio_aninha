@@ -37,7 +37,7 @@ export function HeroSection() {
             <button
               type="button"
               onClick={handleScrollToCatalog}
-              className="mt-5 inline-flex items-center gap-2 rounded-md bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+              className="mt-5 inline-flex items-center gap-2 rounded-md bg-blue-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800"
             >
               Ver catalogo
               <ArrowDown size={16} />
